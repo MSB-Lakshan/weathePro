@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeatherPro - Advanced Weather Forecast</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading weather data...</p>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="logo">
+                    <span class="weather-icon" img src="mylogo.png"></span>
+                    WeatherPro
+                </h1>
+                <div class="header-controls">
+                    <div class="search-container">
+                        <input type="text" id="search-input" placeholder="Search city..." class="search-input">
+                        <button id="search-btn" class="search-btn">🔍</button>
+                    </div>
+                    <button id="location-btn" class="location-btn" title="Use current location">📍</button>
+                    <button id="theme-toggle" class="theme-toggle" title="Toggle theme">🌙</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Current Weather -->
+        <section class="current-weather">
+            <div class="current-weather-content">
+                <div class="current-main">
+                    <div class="current-temp">
+                        <span id="current-temp">--</span>°C
+                    </div>
+                    <div class="current-info">
+                        <h2 id="current-city">Loading...</h2>
+                        <p id="current-description">--</p>
+                        <p id="current-date"></p>
+                    </div>
+                </div>
+                <div class="current-icon">
+                    <img id="current-weather-icon" src="" alt="Weather Icon">
+                </div>
+            </div>
+            <div class="current-details">
+                <div class="detail-item">
+                    <span class="detail-label">Feels like</span>
+                    <span id="feels-like">--°C</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Humidity</span>
+                    <span id="humidity">--%</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Wind</span>
+                    <span id="wind">-- km/h</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Pressure</span>
+                    <span id="pressure">-- hPa</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Visibility</span>
+                    <span id="visibility">-- km</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">UV Index</span>
+                    <span id="uv-index">--</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7-Day Forecast -->
+        <section class="forecast-section">
+            <h3 class="section-title">7-Day Forecast</h3>
+            <div id="forecast-container" class="forecast-container"></div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="charts-section">
+            <h3 class="section-title">Weather Analytics</h3>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h4>Temperature Variation</h4>
+                    <canvas id="temperature-chart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h4>Rainfall Forecast</h4>
+                    <canvas id="rain-chart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h4>Wind Speed & Direction</h4>
+                    <canvas id="wind-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Weather Alerts -->
+        <section class="alerts-section">
+            <h3 class="section-title">Weather Alerts</h3>
+            <div id="alerts-container" class="alerts-container"></div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
