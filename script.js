@@ -1,7 +1,8 @@
 // Weather App JavaScript
+import API_KEY from './config.js';
 class WeatherApp {
     constructor() {
-        this.apiKey = 'API_KEY';
+        this.apiKey = API_KEY;
         this.apiUrl = 'https://api.openweathermap.org/data/2.5';
         this.oneCallUrl = 'https://api.openweathermap.org/data/3.0/onecall';
         this.currentWeatherData = null;
@@ -24,6 +25,52 @@ class WeatherApp {
         document.getElementById('search-btn').addEventListener('click', () => this.handleSearch());
         document.getElementById('search-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.handleSearch();
+        });
+
+        // City autocomplete
+        const searchInput = document.getElementById('search-input');
+        const suggestionsBox = document.getElementById('city-suggestions');
+        let debounceTimeout = null;
+        let activeIndex = -1;
+        let suggestions = [];
+
+        searchInput.addEventListener('input', (e) => {
+            const value = e.target.value.trim();
+            clearTimeout(debounceTimeout);
+            if (!value) {
+                suggestionsBox.classList.remove('active');
+                suggestionsBox.innerHTML = '';
+                return;
+            }
+            debounceTimeout = setTimeout(async () => {
+                suggestions = await this.fetchCitySuggestions(value);
+                this.showCitySuggestions(suggestions, suggestionsBox, searchInput);
+                activeIndex = -1;
+            }, 300);
+        });
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (!suggestions || suggestions.length === 0) return;
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                activeIndex = (activeIndex + 1) % suggestions.length;
+                this.highlightSuggestion(suggestionsBox, activeIndex);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                activeIndex = (activeIndex - 1 + suggestions.length) % suggestions.length;
+                this.highlightSuggestion(suggestionsBox, activeIndex);
+            } else if (e.key === 'Enter') {
+                if (activeIndex >= 0 && activeIndex < suggestions.length) {
+                    e.preventDefault();
+                    this.selectCitySuggestion(suggestions[activeIndex], searchInput, suggestionsBox);
+                }
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!suggestionsBox.contains(e.target) && e.target !== searchInput) {
+                suggestionsBox.classList.remove('active');
+            }
         });
 
         // Location button
@@ -49,8 +96,15 @@ class WeatherApp {
     }
 
     updateThemeIcon(theme) {
-        const themeToggle = document.getElementById('theme-toggle');
-        themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+        const themeIcon = document.getElementById('theme-icon');
+        if (!themeIcon) return;
+        if (theme === 'dark') {
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        } else {
+            themeIcon.classList.remove('fa-sun');
+            themeIcon.classList.add('fa-moon');
+        }
     }
 
     setCurrentDate() {
@@ -653,6 +707,70 @@ class WeatherApp {
                 setTimeout(() => notification.remove(), 300);
             }
         }, 5000);
+    }
+
+    async fetchCitySuggestions(query) {
+        try {
+            const limit = 5;
+            const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=${limit}&appid=${this.apiKey}`;
+            const res = await fetch(url);
+            if (!res.ok) return [];
+            const data = await res.json();
+            // Filter out duplicates by name/country/region
+            const unique = [];
+            const seen = new Set();
+            for (const item of data) {
+                const key = `${item.name},${item.state || ''},${item.country}`;
+                if (!seen.has(key)) {
+                    unique.push(item);
+                    seen.add(key);
+                }
+            }
+            return unique;
+        } catch (err) {
+            return [];
+        }
+    }
+
+    showCitySuggestions(suggestions, suggestionsBox, searchInput) {
+        if (!suggestions || suggestions.length === 0) {
+            suggestionsBox.classList.remove('active');
+            suggestionsBox.innerHTML = '';
+            return;
+        }
+        suggestionsBox.innerHTML = suggestions.map((item, idx) => {
+            const state = item.state ? `, ${item.state}` : '';
+            return `<div class="city-suggestion-item" data-idx="${idx}">${item.name}${state}, ${item.country}</div>`;
+        }).join('');
+        suggestionsBox.classList.add('active');
+        // Mouse selection
+        Array.from(suggestionsBox.children).forEach((el, idx) => {
+            el.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                this.selectCitySuggestion(suggestions[idx], searchInput, suggestionsBox);
+            });
+        });
+    }
+
+    highlightSuggestion(suggestionsBox, idx) {
+        Array.from(suggestionsBox.children).forEach((el, i) => {
+            if (i === idx) {
+                el.classList.add('active');
+                el.scrollIntoView({ block: 'nearest' });
+            } else {
+                el.classList.remove('active');
+            }
+        });
+    }
+
+    selectCitySuggestion(cityObj, searchInput, suggestionsBox) {
+        const state = cityObj.state ? `, ${cityObj.state}` : '';
+        searchInput.value = `${cityObj.name}${state}, ${cityObj.country}`;
+        suggestionsBox.classList.remove('active');
+        suggestionsBox.innerHTML = '';
+        // Immediately search for the selected city
+        this.showLoading();
+        this.getWeatherByCity(cityObj.name);
     }
 }
 

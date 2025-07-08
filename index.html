@@ -6,6 +6,8 @@
     <title>WeatherPro - Advanced Weather Forecast</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome CDN for modern icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -23,16 +25,23 @@
         <header class="header">
             <div class="header-content">
                 <h1 class="logo">
-                    <span class="weather-icon" img src="mylogo.png"></span>
+                    <img src="mylogo.png" alt="WeatherPro Logo" class="logo-img" />
                     WeatherPro
                 </h1>
                 <div class="header-controls">
                     <div class="search-container">
-                        <input type="text" id="search-input" placeholder="Search city..." class="search-input">
-                        <button id="search-btn" class="search-btn">🔍</button>
+                        <input type="text" id="search-input" placeholder="Search city..." class="search-input" autocomplete="off">
+                        <button id="search-btn" class="search-btn" title="Search">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <div id="city-suggestions" class="city-suggestions"></div>
                     </div>
-                    <button id="location-btn" class="location-btn" title="Use current location">📍</button>
-                    <button id="theme-toggle" class="theme-toggle" title="Toggle theme">🌙</button>
+                    <button id="location-btn" class="location-btn" title="Use current location">
+                        <i class="fas fa-location-arrow"></i>
+                    </button>
+                    <button id="theme-toggle" class="theme-toggle" title="Toggle theme">
+                        <i class="fas fa-moon" id="theme-icon"></i>
+                    </button>
                 </div>
             </div>
         </header>
@@ -114,6 +123,6 @@
         </section>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
